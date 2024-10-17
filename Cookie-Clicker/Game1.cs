@@ -6,9 +6,9 @@ namespace Cookie_Clicker
 {
     public class Game1 : Game
     {
-        private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-
+        private TheCookie _theCookie;
+        private GraphicsDeviceManager _graphics;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -19,12 +19,13 @@ namespace Cookie_Clicker
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            _theCookie = new TheCookie();
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
+            _theCookie.LoadContent(Content);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
@@ -43,7 +44,9 @@ namespace Cookie_Clicker
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            _spriteBatch.Begin();
+            _theCookie.Draw(gameTime, _spriteBatch);
+            _spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
