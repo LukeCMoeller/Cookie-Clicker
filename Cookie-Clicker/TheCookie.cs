@@ -1,48 +1,74 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System.Xml.Serialization;
+using CollisionExample;
+using CollisionExample.Collisions;
+using System;
 
 namespace Cookie_Clicker
 {
     public class TheCookie
-{
+    {
         public Texture2D Cookie;
+        public Vector2 Position;
+        public Rectangle source;
+        public float rotation;
+        public Vector2 orgin;
+        public BoundingCircle hitbox;
+        public float score;
+        private float scale = 1f;
+        private bool isShrinking = false;
 
-        /// <summary>
-        /// initializes any information that is needed here
-        /// </summary>
-        public void Initialize()
+
+        public TheCookie()
         {
-            //stuff here
+            // Constructor logic here, if needed
         }
-        /// <summary>
-        /// Loads the sprite texture using the provided ContentManager
-        /// </summary>
-        /// <param name="content">The ContentManager to load with</param>
+
         public void LoadContent(ContentManager content)
         {
-           Cookie = content.Load<Texture2D>("TheCookie");
-             
-        }
+            Cookie = content.Load<Texture2D>("TheCookie");
+            Position = new Vector2(400, 500);
+            source = new Rectangle();
+            orgin = new Vector2(Cookie.Width / 2, Cookie.Height / 2);
 
-        /// <summary>
-        /// Updates the sprite's position based on user input
-        /// </summary>
-        /// <param name="gameTime">The GameTime</param>
+            hitbox = new BoundingCircle(Position, (Cookie.Width * 1.75f) / 2f);
+            score = 1; 
+        }
         public void Update(GameTime gameTime)
         {
+            rotation += (float)(gameTime.ElapsedGameTime.TotalSeconds * 1.1);
 
+            if (isShrinking)
+            {
+                scale -= 1.5f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (scale <= 0.9f)
+                {
+                    scale = 0.9f;
+                    isShrinking = false;
+                }
+            }
+            else if (scale < 1f)
+            {
+                scale += 1.5f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (scale >= 1f)
+                {
+                    scale = 1f;
+                }
+            }
         }
 
-        /// <summary>
-        /// Draws the sprite using the supplied SpriteBatch
-        /// </summary>
-        /// <param name="gameTime">The game time</param>
-        /// <param name="spriteBatch">The spritebatch to render with</param>
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Cookie, new Rectangle(50, 50, 50, 50), Color.White);
+
+            spriteBatch.Draw(Cookie, Position, null, Color.White, rotation, orgin, scale * 1.75f, SpriteEffects.None, 0f);
+        }
+
+
+        public void OnClick()
+        {
+            isShrinking = true;
+            score += 1; // Increment score when clicked
         }
     }
 }
