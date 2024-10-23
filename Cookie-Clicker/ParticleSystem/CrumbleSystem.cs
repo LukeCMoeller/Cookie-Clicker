@@ -45,7 +45,7 @@ namespace ParticleSystemExample
             float normalizelifetime = particle.TimeSinceStart / particle.Lifetime;
             
 
-            particle.Scale = 0.15f + 0.05f * normalizelifetime;
+            particle.Scale = 0.1f + 0.025f * normalizelifetime;
         }
         public void PlaceCrumble(Vector2 where)
         {

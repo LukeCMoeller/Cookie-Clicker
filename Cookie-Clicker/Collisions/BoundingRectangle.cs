@@ -53,5 +53,14 @@ namespace CollisionExample.Collisions
         {
             return CollisisionHelper.Collides(other, this);
         }
+        /// <summary>
+        /// teses a collsion between this and anohter bounding circle
+        /// </summary>
+        /// <param name="other">the other bounding circle</param>
+        /// <returns>true for collision, false otherwise</returns>
+        public bool CollidesWith(Vector2 other)
+        {
+            return CollisisionHelper.Collides(this, other);
+        }
     }
 }

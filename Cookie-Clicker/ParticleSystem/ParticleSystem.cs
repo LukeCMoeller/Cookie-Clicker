@@ -108,7 +108,7 @@ namespace ParticleSystemExample
             freeParticles = new Queue<int>(maxParticles);
             for (int i = 0; i < particles.Length; i++)
             {
-                particles[i].Initialize(Vector2.Zero);
+                particles[i].Initialize(new Vector2(-200, -200));
                 freeParticles.Enqueue(i);
             }
             // Run the InitializeConstants hook
@@ -183,7 +183,7 @@ namespace ParticleSystemExample
                 throw new InvalidOperationException(message);
             }
             // load the texture....
-            texture = contentManager.Load<Texture2D>("TheCookie");
+            texture = contentManager.Load<Texture2D>("bigCookie1");
 
             // ... and calculate the center. this'll be used in the draw call, we
             // always want to rotate and scale around this point.

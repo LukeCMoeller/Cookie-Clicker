@@ -67,5 +67,15 @@ namespace CollisionExample.Collisions
             float distanceSquared = Vector2.DistanceSquared(c.Center, v);
             return distanceSquared <= c.Radius * c.Radius;
         }
+        /// <summary>
+        /// Detects collision between a BoundingRectangle and a Vector2 (point).
+        /// </summary>
+        /// <param name="r">The bounding rectangle.</param>
+        /// <param name="v">The Vector2 point.</param>
+        /// <returns>True if the point is within the rectangle, false otherwise.</returns>
+        public static bool Collides(BoundingRectangle r, Vector2 v)
+        {
+            return v.X >= r.Left && v.X <= r.Right && v.Y >= r.Top && v.Y <= r.Bottom;
+        }
     }
 }
