@@ -38,7 +38,6 @@ namespace Cookie_Clicker
         public float previousScore;
    
         int cookieIndex = 0;
-        SpriteFont _font;
 
         /// <summary>
         /// the boot just hit and your score gets halfved

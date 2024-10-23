@@ -72,10 +72,10 @@ namespace Cookie_Clicker
         {
             _theCookie.LoadContent(Content);
             GameState GS = importer.Load();
-            if (GS.score > 0)
+            if (GS.Score != -1)
             {
-                _theCookie.score = GS.score;
-                _theCookie.previousScore = GS.previousScore;
+                _theCookie.score = GS.Score;
+                _theCookie.previousScore = GS.PreviousScore;
                 _elapsedTime = GS.Time;
                 GameStart = GS.Gamestart;
             }
