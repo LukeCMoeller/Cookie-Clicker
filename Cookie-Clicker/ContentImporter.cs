@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Cookie_Clicker
 {
@@ -12,59 +13,51 @@ namespace Cookie_Clicker
     {
         string name = "SaveData.txt";
         string assests = "Assest.txt";
-        public  string[] Load()
+        public GameState Load()
         {
-            string[] info = new string[13];
-            string[] info2 = new string[4];
+            GameState GM1 = new GameState();
+            GameState GM2 = new GameState();
             if (File.Exists(name))
             {
                 using (StreamReader reader = new StreamReader(name))
                 {
-                    info2[0] = reader.ReadLine();
-                    info2[1] = reader.ReadLine();
-                    info2[2] = reader.ReadLine();
-                    info2[3] = reader.ReadLine();
-                    if (info2[0] == null)
+                    GM1 = JsonSerializer.Deserialize<GameState>(reader.ReadLine());
+                    if(GM1 == null)
                     {
                         return default;
                     }
                 }
-                info2[0] = info2[0].Substring(7);
-                info2[1] = info2[1].Substring(15);
-                info2[2] = info2[2].Substring(6);
-                info2[3] = info2[3].Substring(11);
             }
             if (File.Exists(assests))
             {
                 using (StreamReader reader = new StreamReader(assests))
                 {
-                    string line;
-                    int i = 0;
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        info[i] = Decrypt(line, 'C'); 
-                        i++;
-                    }
-                    if(info[0] == null)
+                    GM2 = JsonSerializer.Deserialize<GameState>(reader.ReadLine());
+                    if(GM2 == null)
                     {
                         return default;
                     }
                 }
-                info[0] = info[0].Substring(7);
-                info[4] = info[4].Substring(15);
-                info[8] = info[8].Substring(6);
-                info[12] = info[12].Substring(11);
             }
-            
-            if (info[0] != info2[0] || info[4] != info2[1] || info[8] != info2[2] || info[12] != info2[3])
+            if (GM1.score != GM2.score || GM1.previousScore != GM2.previousScore || GM1.Time != GM2.Time || GM1.Gamestart != GM2.Gamestart)
             {
-                info[0] = "3" + info[0];
-                info[4] = "3" + info[4];
+                GM2.score += 3;
+                GM2.previousScore += 3;
             }
-            return info;
+            return GM2;
         }
         public void Save(GameState gs)
         {
+            string SearlizedString = JsonSerializer.Serialize(gs.encoded);
+            string SearlizedString2 = JsonSerializer.Serialize(gs.encryptedPlus());
+            using (StreamWriter writer = new StreamWriter(name))
+            {
+                writer.WriteLine(SearlizedString);
+            }
+            using (StreamWriter writer = new StreamWriter(assests))
+            {
+                writer.WriteLine(SearlizedString2);
+            }
             //try to serialize gamestate. 
             /*
             using (StreamWriter writer = new StreamWriter(name))
@@ -92,22 +85,7 @@ namespace Cookie_Clicker
             }*/
 
         }
-        /// <summary>
-        /// encryption and decrytpion provided by gbt
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        static string Encrypt(string text, char key)
-        {
-            char[] buffer = text.ToCharArray();
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                buffer[i] = (char)(buffer[i] ^ key);
-            }
-            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(buffer));
-        }
-
+        
         static string Decrypt(string encryptedText, char key)
         {
             byte[] buffer = Convert.FromBase64String(encryptedText);

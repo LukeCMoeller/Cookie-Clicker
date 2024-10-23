@@ -26,8 +26,8 @@ namespace Cookie_Clicker
         Song test;
         private Texture2D Cursor;
         private goldencookie _goldencookie;
-        private double miniBootSpawnTimer;
-        private double miniBootSpawnInterval;
+        private double GoldenTimer;
+        private double GoldenSpawnInterval;
         public ContentImporter importer;
         public Game1()
         {
@@ -38,9 +38,9 @@ namespace Cookie_Clicker
         /// <summary>
         /// creates a new random interval between 30 and 60 seconds
         /// </summary>
-        private void SetMiniBootSpawnInterval()
+        private void GoldenSpawntime()
         {
-            miniBootSpawnInterval = random.Next(10, 15);
+            GoldenSpawnInterval = random.Next(10, 15);
         }
         protected override void Initialize()
         {
@@ -51,8 +51,8 @@ namespace Cookie_Clicker
 
             _goldencookie = new goldencookie();
             random = new Random();
-            SetMiniBootSpawnInterval();
-            miniBootSpawnTimer = 0;
+            GoldenSpawntime();
+            GoldenTimer = 0;
 
 
             music = Content.Load<Song>("CookieClickerTheme");
@@ -71,13 +71,13 @@ namespace Cookie_Clicker
         protected override void LoadContent()
         {
             _theCookie.LoadContent(Content);
-            string[] saveData = importer.Load();
-            if (saveData[0] != null)
+            GameState GS = importer.Load();
+            if (GS.score > 0)
             {
-                _theCookie.score = float.Parse(saveData[0]);
-                _theCookie.previousScore = float.Parse(saveData[4]);
-                _elapsedTime =  double.Parse(saveData[8]);
-                GameStart = bool.Parse(saveData[12]);
+                _theCookie.score = GS.score;
+                _theCookie.previousScore = GS.previousScore;
+                _elapsedTime = GS.Time;
+                GameStart = GS.Gamestart;
             }
 
             Cursor = Content.Load<Texture2D>("TheShoe");
@@ -171,9 +171,9 @@ namespace Cookie_Clicker
             }
             #endregion
             #region goldencookie
-            // MiniBoot spawn timer
-            miniBootSpawnTimer += gameTime.ElapsedGameTime.TotalSeconds;
-            if (miniBootSpawnTimer >= miniBootSpawnInterval && _goldencookie.isVisible == false && GameStart == true)
+            // golden cookie spawn timer
+            GoldenTimer += gameTime.ElapsedGameTime.TotalSeconds;
+            if (GoldenTimer >= GoldenSpawnInterval && _goldencookie.isVisible == false && GameStart == true)
             {
                 _goldencookie.Spawn();
 
@@ -185,8 +185,8 @@ namespace Cookie_Clicker
                     if (_goldencookie.isVisible)
                     {
                         _goldencookie.onClick(); 
-                        SetMiniBootSpawnInterval();
-                        miniBootSpawnTimer = 0;
+                        GoldenSpawntime();
+                        GoldenTimer = 0;
                         _theBoot.onTrigger();
                     }
 
@@ -244,24 +244,21 @@ namespace Cookie_Clicker
             if(superGameEnd == false)
             {
                 _theShoe.Draw(gameTime, _spriteBatch);
-                if (GameStart == false){ _spriteBatch.DrawString(_font, "Clicker", new Vector2(425, 50), Color.White); }
-                else{_spriteBatch.DrawString(_font, "Kicker", new Vector2(425, 50), Color.White);}
-
                 _spriteBatch.DrawString(_font, "Cookie", new Vector2(325, 50), Color.White);
                 if (GameStart != true)
                 {
+                    _spriteBatch.DrawString(_font, "Clicker", new Vector2(425, 50), Color.White);
                     _spriteBatch.DrawString(_font, "Score: " + _theCookie.score.ToString(), new Vector2(10, 10), Color.White);
                 }
                 else
                 {
+                    _spriteBatch.DrawString(_font, "Kicker", new Vector2(425, 50), Color.White);
                     _spriteBatch.DrawString(_font, "Score: " + _theCookie.score.ToString("F3"), new Vector2(10, 10), Color.White);
                 }
-
                 _spriteBatch.DrawString(_font, $"Time: {(int)_elapsedTime}", new Vector2(10, 50), Color.White);
                 _theCookie.Draw(gameTime, _spriteBatch);
                 _theBoot.Draw(gameTime, _spriteBatch);
                 _goldencookie.Draw(gameTime, _spriteBatch);
-
             }
             else
             {
@@ -274,9 +271,8 @@ namespace Cookie_Clicker
         }
         protected override void OnExiting(object sender, EventArgs args)
         {
-            GameState gs = new GameState(_theCookie.score, _theCookie.previousScore, _elapsedTime, GameStart)
+            GameState gs = new GameState(_theCookie.score, _theCookie.previousScore, _elapsedTime, GameStart);
             importer.Save(gs);
-
             base.OnExiting(sender, args);
         }
     }

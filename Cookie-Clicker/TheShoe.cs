@@ -20,24 +20,26 @@ public class TheShoe
         Random random = new Random();
         rotation = RandomHelper.NextFloat(0, MathHelper.TwoPi);
         Shoe = content.Load<Texture2D>("TheShoe");
-        Position = new Vector2(RandomHelper.NextFloat(50, 750), -50);
+
+        Position = new Vector2(RandomHelper.NextFloat(32, 768), -32);
 
         Hitbox = new BoundingRectangle(Position.X - 16, Position.Y - 16, 32, 32);
     }
 
     public void Update(GameTime gameTime)
     {
-        if (Position.Y < 984)
+        if (Position.Y < 1032)
         {
             Position.Y += 6;
-            rotation += (float)(gameTime.ElapsedGameTime.TotalSeconds * 7);
+            rotation -= (float)(gameTime.ElapsedGameTime.TotalSeconds * 7);
 
             Hitbox.X = Position.X - 16;
             Hitbox.Y = Position.Y - 16;
         }
         else
         {
-            rotation = 0;
+            Position.Y = -32;
+            Position.X = RandomHelper.NextFloat(32, 768);
         }
     }
 

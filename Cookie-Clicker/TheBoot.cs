@@ -15,7 +15,6 @@ namespace Cookie_Clicker
 
         private Texture2D Boot;
         private Vector2 Position;
-        private float speed;
         private float waitTimer;
         private enum BootState { Falling, Waiting, Rising }
         private BootState state;
@@ -23,7 +22,7 @@ namespace Cookie_Clicker
         SoundEffect terminalExplison; 
         public void LoadContent(ContentManager content)
         {
-            terminalExplison = content.Load<SoundEffect>("TerminalExplosion");
+            //terminalExplison = content.Load<SoundEffect>("TerminalExplosion");
             Random random = new Random();
             Boot = content.Load<Texture2D>("TheBoot");
 
@@ -46,7 +45,7 @@ namespace Cookie_Clicker
                         state = BootState.Waiting;
                         waitTimer = 1.5f;
                         OnBootHit?.Invoke();
-                        terminalExplison.Play();
+                        //terminalExplison.Play();
                     }
                 }
                 else if (state == BootState.Waiting)
