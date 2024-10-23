@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using ParticleSystemExample;
 using System;
+using System.Windows.Forms.Design;
 
 namespace Cookie_Clicker
 {
@@ -27,6 +28,7 @@ namespace Cookie_Clicker
         private goldencookie _goldencookie;
         private double miniBootSpawnTimer;
         private double miniBootSpawnInterval;
+        public ContentImporter importer;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -42,6 +44,7 @@ namespace Cookie_Clicker
         }
         protected override void Initialize()
         {
+            importer = new ContentImporter();
             test = Content.Load<Song>("test");
             _theBoot = new TheBoot();
             _theBoot.OnBootHit = TheBootHit;
@@ -67,15 +70,33 @@ namespace Cookie_Clicker
         }
         protected override void LoadContent()
         {
+            _theCookie.LoadContent(Content);
+            string[] saveData = importer.Load();
+            if (saveData[0] != null)
+            {
+                _theCookie.score = float.Parse(saveData[0]);
+                _theCookie.previousScore = float.Parse(saveData[4]);
+                _elapsedTime =  double.Parse(saveData[8]);
+                GameStart = bool.Parse(saveData[12]);
+            }
+
             Cursor = Content.Load<Texture2D>("TheShoe");
             _goldencookie.LoadContent(Content);
             _theBoot.LoadContent(Content);
             _theShoe.LoadContent(Content);
-            _theCookie.LoadContent(Content);
+          
             _font = Content.Load<SpriteFont>("Phy");
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             MediaPlayer.IsRepeating = true;
-
+            if (GameStart == true)
+            {
+                _theCookie.gamestart = true;
+                if (MediaPlayer.State != MediaState.Playing)
+                {
+                    MediaPlayer.Play(test);
+                    isVolumeIncreasing = true;
+                }
+            }
         }
 
         /// <summary>
@@ -91,6 +112,7 @@ namespace Cookie_Clicker
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
             _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
 
 
@@ -151,7 +173,7 @@ namespace Cookie_Clicker
             #region goldencookie
             // MiniBoot spawn timer
             miniBootSpawnTimer += gameTime.ElapsedGameTime.TotalSeconds;
-            if (miniBootSpawnTimer >= miniBootSpawnInterval && _goldencookie.isVisible == false)
+            if (miniBootSpawnTimer >= miniBootSpawnInterval && _goldencookie.isVisible == false && GameStart == true)
             {
                 _goldencookie.Spawn();
 
@@ -179,8 +201,16 @@ namespace Cookie_Clicker
             {
                 return;
             }
-            _theBoot.Update(gameTime);
-            _theShoe.Update(gameTime);
+
+            if(GameStart != true)
+            {
+                _theShoe.Update(gameTime);
+            }
+            else
+            {
+                _theBoot.Update(gameTime);
+            }
+
  
         }
         #region boot stuff
@@ -241,6 +271,13 @@ namespace Cookie_Clicker
             _spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+        protected override void OnExiting(object sender, EventArgs args)
+        {
+            GameState gs = new GameState(_theCookie.score, _theCookie.previousScore, _elapsedTime, GameStart)
+            importer.Save(gs);
+
+            base.OnExiting(sender, args);
         }
     }
 }

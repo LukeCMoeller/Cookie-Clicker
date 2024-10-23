@@ -35,7 +35,7 @@ namespace Cookie_Clicker
         /// <summary>
         /// saves the previous score
         /// </summary>
-        float previousScore;
+        public float previousScore;
    
         int cookieIndex = 0;
         SpriteFont _font;

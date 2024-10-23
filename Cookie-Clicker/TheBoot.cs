@@ -1,6 +1,7 @@
 ﻿using System;
 using CollisionExample.Collisions;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -19,8 +20,10 @@ namespace Cookie_Clicker
         private enum BootState { Falling, Waiting, Rising }
         private BootState state;
         bool Begin = false;
+        SoundEffect terminalExplison; 
         public void LoadContent(ContentManager content)
         {
+            terminalExplison = content.Load<SoundEffect>("TerminalExplosion");
             Random random = new Random();
             Boot = content.Load<Texture2D>("TheBoot");
 
@@ -43,6 +46,7 @@ namespace Cookie_Clicker
                         state = BootState.Waiting;
                         waitTimer = 1.5f;
                         OnBootHit?.Invoke();
+                        terminalExplison.Play();
                     }
                 }
                 else if (state == BootState.Waiting)
