@@ -41,9 +41,7 @@ namespace Cookie_Clicker
         }
         public void Decoder(string[] what)
         {
-
             string[] decodedArray = new string[what.Length];
-
             for (int i = 0; i < what.Length; i++)
             {
 

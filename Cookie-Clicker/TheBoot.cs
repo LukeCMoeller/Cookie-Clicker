@@ -22,7 +22,7 @@ namespace Cookie_Clicker
         SoundEffect terminalExplison; 
         public void LoadContent(ContentManager content)
         {
-            //terminalExplison = content.Load<SoundEffect>("TerminalExplosion");
+            terminalExplison = content.Load<SoundEffect>("TerminalExplosion");
             Random random = new Random();
             Boot = content.Load<Texture2D>("TheBoot");
 
@@ -45,7 +45,7 @@ namespace Cookie_Clicker
                         state = BootState.Waiting;
                         waitTimer = 1.5f;
                         OnBootHit?.Invoke();
-                        //terminalExplison.Play();
+                        terminalExplison.Play();
                     }
                 }
                 else if (state == BootState.Waiting)
@@ -68,14 +68,12 @@ namespace Cookie_Clicker
             }
             
         }
-
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             if(Begin == true)
             {
                 spriteBatch.Draw(Boot, Position, null, Color.White, 0f, new Vector2(100, 100), 4f, SpriteEffects.None, 0f);
             }
-            
         }
         public void onTrigger()
         {

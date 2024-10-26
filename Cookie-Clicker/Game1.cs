@@ -5,20 +5,23 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using ParticleSystemExample;
 using System;
+using System.Threading.Tasks.Sources;
 using System.Windows.Forms.Design;
 
 namespace Cookie_Clicker
 {
     public class Game1 : Game
     {
+        TileMap tileMap;
+        TextHandler th;
         private Song music;
         private SpriteBatch _spriteBatch;
         private TheCookie _theCookie;
         private GraphicsDeviceManager _graphics;
-        private SpriteFont _font;
         private CrumbleSystem _crumble;
         private MouseState _past;
         private double _elapsedTime;
+        private SpriteFont _font;
         private TheShoe _theShoe;
         private bool GameStart;
         bool superGameEnd;
@@ -29,6 +32,8 @@ namespace Cookie_Clicker
         private double GoldenTimer;
         private double GoldenSpawnInterval;
         public ContentImporter importer;
+        Texture2D mess;
+        Texture2D end;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -40,10 +45,12 @@ namespace Cookie_Clicker
         /// </summary>
         private void GoldenSpawntime()
         {
-            GoldenSpawnInterval = random.Next(10, 15);
+            GoldenSpawnInterval = random.Next(30, 60);
         }
         protected override void Initialize()
         {
+            tileMap = new TileMap();
+            th = new TextHandler();
             importer = new ContentImporter();
             test = Content.Load<Song>("test");
             _theBoot = new TheBoot();
@@ -70,6 +77,10 @@ namespace Cookie_Clicker
         }
         protected override void LoadContent()
         {
+            _font = Content.Load<SpriteFont>("Phy");
+            mess = Content.Load<Texture2D>("mess");
+            end = Content.Load<Texture2D>("bigCookie1");
+            tileMap.LoadContent(Content);
             _theCookie.LoadContent(Content);
             GameState GS = importer.Load();
             if (GS.Score != -1)
@@ -78,18 +89,21 @@ namespace Cookie_Clicker
                 _theCookie.previousScore = GS.PreviousScore;
                 _elapsedTime = GS.Time;
                 GameStart = GS.Gamestart;
+                if(_theCookie.score <= 0)
+                {
+                    superGameEnd=true;
+                }
             }
-
+            th.LoadContent(Content);    
             Cursor = Content.Load<Texture2D>("TheShoe");
             _goldencookie.LoadContent(Content);
             _theBoot.LoadContent(Content);
             _theShoe.LoadContent(Content);
-          
-            _font = Content.Load<SpriteFont>("Phy");
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             MediaPlayer.IsRepeating = true;
             if (GameStart == true)
             {
+                Mouse.SetCursor(MouseCursor.FromTexture2D(Cursor, 0, 0));
                 _theCookie.gamestart = true;
                 if (MediaPlayer.State != MediaState.Playing)
                 {
@@ -112,10 +126,17 @@ namespace Cookie_Clicker
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            if (_theCookie.score <= 0)
+            {
+                superGameEnd = true;
+            }
+            else
+            {
 
+           
             _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
-
-
+            th.Update(gameTime);
+            tileMap.Update(gameTime);
 
 
             ///handle cookie clicking
@@ -135,6 +156,7 @@ namespace Cookie_Clicker
             ///handle  shoe input
             if (mouse.LeftButton == ButtonState.Pressed && _past.LeftButton == ButtonState.Released)
             {
+
                 if (_theShoe.Hitbox.CollidesWith(mousePosition))
                 {
 
@@ -172,7 +194,11 @@ namespace Cookie_Clicker
             #endregion
             #region goldencookie
             // golden cookie spawn timer
-            GoldenTimer += gameTime.ElapsedGameTime.TotalSeconds;
+            if(GameStart == true)
+            {
+                GoldenTimer += gameTime.ElapsedGameTime.TotalSeconds;
+            }
+            
             if (GoldenTimer >= GoldenSpawnInterval && _goldencookie.isVisible == false && GameStart == true)
             {
                 _goldencookie.Spawn();
@@ -197,7 +223,7 @@ namespace Cookie_Clicker
             _past = mouse;
             _theCookie.Update(gameTime);
             base.Update(gameTime);
-            if (_elapsedTime < 4)
+            if (_elapsedTime < 10)
             {
                 return;
             }
@@ -210,8 +236,7 @@ namespace Cookie_Clicker
             {
                 _theBoot.Update(gameTime);
             }
-
- 
+            }
         }
         #region boot stuff
         bool isShaking = false;
@@ -240,30 +265,24 @@ namespace Cookie_Clicker
                 shakeTransform = Matrix.CreateTranslation(shakeOffset.X, shakeOffset.Y, 0);
             }
             _spriteBatch.Begin(transformMatrix: shakeTransform);
-  
-            if(superGameEnd == false)
+            
+            if (superGameEnd == false)
             {
+                tileMap.Draw(gameTime, _spriteBatch);
+                th.Draw(gameTime, _spriteBatch, _elapsedTime, _theCookie.score, GameStart);
                 _theShoe.Draw(gameTime, _spriteBatch);
-                _spriteBatch.DrawString(_font, "Cookie", new Vector2(325, 50), Color.White);
-                if (GameStart != true)
-                {
-                    _spriteBatch.DrawString(_font, "Clicker", new Vector2(425, 50), Color.White);
-                    _spriteBatch.DrawString(_font, "Score: " + _theCookie.score.ToString(), new Vector2(10, 10), Color.White);
-                }
-                else
-                {
-                    _spriteBatch.DrawString(_font, "Kicker", new Vector2(425, 50), Color.White);
-                    _spriteBatch.DrawString(_font, "Score: " + _theCookie.score.ToString("F3"), new Vector2(10, 10), Color.White);
-                }
-                _spriteBatch.DrawString(_font, $"Time: {(int)_elapsedTime}", new Vector2(10, 50), Color.White);
                 _theCookie.Draw(gameTime, _spriteBatch);
                 _theBoot.Draw(gameTime, _spriteBatch);
                 _goldencookie.Draw(gameTime, _spriteBatch);
+
             }
-            else
+            else if (superGameEnd == true)
             {
                 GraphicsDevice.Clear(new Color(0, 0, 0));
-                _spriteBatch.DrawString(_font, "GAME IS SUPER END", new Vector2(325, 50), Color.Red);
+                _spriteBatch.DrawString(_font, "Look what you did to my kitchen floor >:(", new Vector2(160, 600), Color.White);
+                _spriteBatch.Draw(mess, new Rectangle(0, 100, 800, 500), Color.White);
+                _spriteBatch.DrawString(_font, "Thanks for kicking!", new Vector2(280, 630), Color.White);
+                MediaPlayer.Stop();
             }
             _spriteBatch.End();
 
