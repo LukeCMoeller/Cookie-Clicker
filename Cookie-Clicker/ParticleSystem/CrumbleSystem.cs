@@ -31,12 +31,12 @@ namespace ParticleSystemExample
         }
         protected override void InitializeParticle(ref Particle p, Vector2 where)
         {
-            var velocity = RandomHelper.NextDirection() * RandomHelper.NextFloat(120, 200);
-            var lifetime = RandomHelper.NextFloat(0.3f, 0.5f);
+            var velocity = RandomHelper.NextDirection() * RandomHelper.NextFloat(300, 350);
+            var lifetime = RandomHelper.NextFloat(0.25f, 0.45f);
             var rotation = RandomHelper.NextFloat(0, MathHelper.TwoPi);
             var angularVelocity = RandomHelper.NextFloat(-MathHelper.PiOver4, MathHelper.PiOver4);
             var acceleration = -velocity / lifetime;
-            var scale = RandomHelper.NextFloat(3, 6);
+            var scale = RandomHelper.NextFloat(1, 3);
             p.Initialize(where, velocity, acceleration, color, lifetime: lifetime, rotation: rotation, angularVelocity: angularVelocity, scale: scale);
         }
         protected override void UpdateParticle(ref Particle particle, float dt)

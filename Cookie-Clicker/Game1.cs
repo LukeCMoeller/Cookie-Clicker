@@ -279,6 +279,9 @@ namespace Cookie_Clicker
             else if (superGameEnd == true)
             {
                 GraphicsDevice.Clear(new Color(0, 0, 0));
+                _crumble.Enabled = false;
+                _crumble.Visible = false;
+
                 _spriteBatch.DrawString(_font, "Look what you did to my kitchen floor >:(", new Vector2(160, 600), Color.White);
                 _spriteBatch.Draw(mess, new Rectangle(0, 100, 800, 500), Color.White);
                 _spriteBatch.DrawString(_font, "Thanks for kicking!", new Vector2(280, 630), Color.White);
